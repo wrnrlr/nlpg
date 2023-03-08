@@ -1,47 +1,42 @@
-use pgx::prelude::*;
-use rust_bert::pipelines::translation::{Language, TranslationModelBuilder};
+mod nlp;
+pub use nlp::get_model;
+use pgx::{prelude::*, error, info, warning, PgRelation, FATAL, PANIC};
+use rust_bert::pipelines::translation::{Language, TranslationModel, TranslationModelBuilder};
+use rust_bert::RustBertError;
 
 pg_module_magic!();
 
-fn string_to_language(s:&str)->Option<Language> {
-    match s {
-        "en" => Some(Language::English),
-        "es" => Some(Language::Spanish),
-        "pt" => Some(Language::Portuguese),
-        "it" => Some(Language::Italian),
-        "ca" => Some(Language::Catalan),
-        "de" => Some(Language::German),
-        "ru" => Some(Language::Russian),
-        "zh" => Some(Language::ChineseMandarin),
-        "nl" => Some(Language::Dutch),
-        "sv" => Some(Language::Swedish),
-        "ar" => Some(Language::Arabic),
-        "he" => Some(Language::Hebrew),
-        "hi" => Some(Language::Hindi),
-        _ => None
-    }
-}
-
 #[pg_extern]
 fn translate(from:&str, to:&str, text:&str)->String {
-    let source = string_to_language(from).unwrap();
-    let target = string_to_language(to).unwrap();
-    let model = TranslationModelBuilder::new()
-        .with_source_languages(vec![source])
-        .with_target_languages(vec![target])
-        .create_model().unwrap();
-    let output = model.translate(&[text], None, Language::Spanish).unwrap();
-    if output.len() == 0 { "".to_string() } else { output[0].to_string() }
+    info!("welcome");
+    let result = nlp::get_model(from, to);
+    if result.is_err() { FATAL!("fatal model") }
+    let (source, target, model) = result.unwrap();
+    let output = model.translate(&[text], source, target);
+    output.unwrap()[0].to_string()
 }
 
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
-    use pgx::prelude::*;
+    // use pgx::prelude::*;
+    use pgx::{prelude::*, error, info, warning, PgRelation, FATAL, PANIC};
+
+    #[test]
+    fn test_get_model_without_pg() {
+        assert!(crate::get_model("nl","en").is_ok());
+    }
 
     #[pg_test]
-    fn test_hello_kvk() {
+    fn test_get_model_with_pg() {
+        assert!(crate::get_model("nl","en").is_ok());
+    }
+
+    #[pg_test]
+    fn test_translate() {
+        info!("welcome");
         assert_eq!("hello", crate::translate("nl","en","hallo"));
+        FATAL!("goodbye");
     }
 
 }
