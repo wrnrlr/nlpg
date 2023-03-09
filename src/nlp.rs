@@ -1,5 +1,4 @@
 use rust_bert::pipelines::translation::{Language, TranslationModel, TranslationModelBuilder};
-use rust_bert::RustBertError;
 
 fn string_to_language(s:&str)->Option<Language> {
     match s {
@@ -30,6 +29,6 @@ pub fn get_model(from:&str, to:&str)->Result<(Language, Language, TranslationMod
         .with_source_languages(vec![source.unwrap()])
         .with_target_languages(vec![target.unwrap()])
         .create_model();
-    if let Some(err) = &model.as_ref().err() { return Err("can't create model".to_string()) }
+    if let Some(_err) = &model.as_ref().err() { return Err("can't create model".to_string()) }
     Ok((source.unwrap(), target.unwrap(), model.unwrap()))
 }

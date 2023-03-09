@@ -1,8 +1,6 @@
 mod nlp;
 pub use nlp::get_model;
-use pgx::{prelude::*, error, info, warning, PgRelation, FATAL, PANIC};
-use rust_bert::pipelines::translation::{Language, TranslationModel, TranslationModelBuilder};
-use rust_bert::RustBertError;
+use pgx::{prelude::*, info, FATAL};
 
 pg_module_magic!();
 
@@ -20,7 +18,7 @@ fn translate(from:&str, to:&str, text:&str)->String {
 #[pg_schema]
 mod tests {
     // use pgx::prelude::*;
-    use pgx::{prelude::*, error, info, warning, PgRelation, FATAL, PANIC};
+    use pgx::{prelude::*, info, FATAL};
 
     #[test]
     fn test_get_model_without_pg() {
