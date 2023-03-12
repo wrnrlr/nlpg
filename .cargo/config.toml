@@ -1,0 +1,9 @@
+[target.'cfg(target_os="macos")']
+# Postgres symbols won't be available until runtime
+rustflags = ["-Clink-arg=-Wl,-undefined,dynamic_lookup"]
+
+#rustflags = ["-Clink-arg=-Wl,-bundle,-bundle_loader /opt/homebrew/bin/postmaster"]
+
+
+# -Wl,-bundle and -Wl,-bundle_loader,/path/to/postmaster
+# /opt/homebrew/bin/postmaster
