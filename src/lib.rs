@@ -1,42 +1,30 @@
 mod nlp;
 pub use nlp::get_model;
-use pgx::{prelude::*, info, FATAL};
+use pgx::prelude::*;
 
 pg_module_magic!();
 
-#[pg_extern]
-fn translate(from:&str, to:&str, text:&str)->String {
-    info!("welcome");
-    let result = nlp::get_model(from, to);
-    if result.is_err() { FATAL!("fatal model") }
-    let (source, target, model) = result.unwrap();
-    let output = model.translate(&[text], source, target);
-    output.unwrap()[0].to_string()
+#[pg_schema]
+pub mod bert {
+    use super::nlp;
+    use pgx::{prelude::*, warning};
+    #[pg_extern]
+    pub fn translate(from:&str, to:&str, text:&str)->String {
+        let result = nlp::get_model(from, to);
+        if result.is_err() { warning!("can't find model: {:?}", result.as_ref().err()); }
+        let (source, target, model) = result.unwrap();
+        let output = model.translate(&[text], source, target);
+        output.unwrap()[0].to_string()
+    }
 }
 
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
-    // use pgx::prelude::*;
-    use pgx::{prelude::*, info, FATAL};
-
-    #[test]
-    fn test_get_model_without_pg() {
-        assert!(crate::get_model("nl","en").is_ok());
-    }
+    use pgx::{prelude::*};
 
     #[pg_test]
-    fn test_get_model_with_pg() {
-        assert!(crate::get_model("nl","en").is_ok());
-    }
-
-    #[pg_test]
-    fn test_translate() {
-        info!("welcome");
-        assert_eq!("hello", crate::translate("nl","en","hallo"));
-        FATAL!("goodbye");
-    }
-
+    fn bert_translate() { assert_eq!("hello", crate::bert::translate("nl","en","hallo")); }
 }
 
 /// This module is required by `cargo pgx test` invocations. 

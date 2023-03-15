@@ -1,4 +1,7 @@
+use pgx::{warning};
 use rust_bert::pipelines::translation::{Language, TranslationModel, TranslationModelBuilder};
+
+// type Translator = fn(text:&str)->Result<String, String>;
 
 fn string_to_language(s:&str)->Option<Language> {
     match s {
@@ -29,6 +32,23 @@ pub fn get_model(from:&str, to:&str)->Result<(Language, Language, TranslationMod
         .with_source_languages(vec![source.unwrap()])
         .with_target_languages(vec![target.unwrap()])
         .create_model();
-    if let Some(_err) = &model.as_ref().err() { return Err("can't create model".to_string()) }
-    Ok((source.unwrap(), target.unwrap(), model.unwrap()))
+    match model {
+        Ok(model) => Ok((source.unwrap(), target.unwrap(), model)),
+        Err(e) => Err(e.to_string())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn get_model() {
+        assert!(crate::get_model("nl", "en").is_ok());
+    }
+
+    #[test]
+    fn tranlation() {
+        let (source, target, model) = crate::get_model("nl", "en").unwrap();
+        let result = model.translate(&["hallo"], source, target);
+        assert!(result.is_ok())
+    }
 }
