@@ -12,9 +12,9 @@ pub mod bert {
     pub fn translate(from:&str, to:&str, text:&str)->String {
         let result = nlp::get_model(from, to);
         if result.is_err() { warning!("can't find model: {:?}", result.as_ref().err()); }
-        let (source, target, model) = result.unwrap();
-        let output = model.translate(&[text], source, target);
-        output.unwrap()[0].to_string()
+        let translator = result.unwrap();
+        translator.translate(text)
+        // "TODO".to_string()
     }
 }
 
