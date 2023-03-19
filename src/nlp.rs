@@ -97,13 +97,12 @@ pub fn get_sentence_embeddings_model()->Result<Arc<MySentenceEmbeddingsModel>,St
 mod tests {
     #[test]
     fn get_model() {
-        assert!(crate::get_translation_model("nl", "en").is_ok());
+        assert!(super::get_translation_model("nl", "en").is_ok());
     }
 
     #[test]
-    fn tranlation() {
-        let (source, target, model) = crate::get_translation_model("nl", "en").unwrap();
-        let result = model.0.translate(&["hallo"], source, target);
-        assert!(result.is_ok())
+    fn translate() {
+        let model = super::get_translation_model("nl", "en").unwrap();
+        assert_eq!(model.translate("hallo"), "hello")
     }
 }

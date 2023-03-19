@@ -25,6 +25,17 @@ pub mod bert {
     }
 }
 
+pub fn serialize_vector(v:Vec<f32>)->String {
+    let mut buffer = ryu::Buffer::new();
+    let mut s = String::from('[');
+    for (i,f) in v.iter().enumerate() {
+        if i != 0 { s.push(','); }
+        s.push_str(buffer.format(*f));
+    }
+    s.push(']');
+    s
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
@@ -32,6 +43,13 @@ mod tests {
 
     #[pg_test]
     fn bert_translate() { assert_eq!("hello", crate::bert::translate("nl","en","hallo")); }
+
+    #[test]
+    fn serialize_vector_test() {
+        assert_eq!(crate::serialize_vector(vec![]), "[]");
+        assert_eq!(crate::serialize_vector(vec![0.12345678907]), "[0.12345679]");
+        assert_eq!(crate::serialize_vector(vec![1.0, 2.0]), "[1.0,2.0]");
+    }
 }
 
 /// This module is required by `cargo pgx test` invocations. 
