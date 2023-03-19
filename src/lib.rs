@@ -1,5 +1,5 @@
 mod nlp;
-pub use nlp::get_model;
+
 use pgx::prelude::*;
 
 pg_module_magic!();
@@ -10,11 +10,18 @@ pub mod bert {
     use pgx::{prelude::*, warning};
     #[pg_extern]
     pub fn translate(from:&str, to:&str, text:&str)->String {
-        let result = nlp::get_model(from, to);
+        let result = nlp::get_translation_model(from, to);
         if result.is_err() { warning!("can't find model: {:?}", result.as_ref().err()); }
         let translator = result.unwrap();
         translator.translate(text)
         // "TODO".to_string()
+    }
+
+    #[pg_extern]
+    pub fn sentence_embeddings(sentence:&str)->String {
+        let model = nlp::get_sentence_embeddings_model();
+        if model.is_err() { warning!("can't find model: {:?}", model.as_ref().err()); }
+        format!("{:?}", &model.unwrap().encode(sentence))
     }
 }
 
