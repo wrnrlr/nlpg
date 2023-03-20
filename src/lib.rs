@@ -6,7 +6,7 @@ pg_module_magic!();
 
 #[pg_schema]
 pub mod bert {
-    use super::nlp;
+    use super::{nlp,serialize_vector};
     use pgx::{prelude::*, warning};
     #[pg_extern]
     pub fn translate(from:&str, to:&str, text:&str)->String {
@@ -14,14 +14,13 @@ pub mod bert {
         if result.is_err() { warning!("can't find model: {:?}", result.as_ref().err()); }
         let translator = result.unwrap();
         translator.translate(text)
-        // "TODO".to_string()
     }
 
     #[pg_extern]
     pub fn sentence_embeddings(sentence:&str)->String {
         let model = nlp::get_sentence_embeddings_model();
         if model.is_err() { warning!("can't find model: {:?}", model.as_ref().err()); }
-        format!("{:?}", &model.unwrap().encode(sentence))
+        serialize_vector(model.unwrap().encode(sentence))
     }
 }
 
