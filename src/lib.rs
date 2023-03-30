@@ -1,16 +1,16 @@
-mod nlp;
+mod models;
 
 use pgx::prelude::*;
 
 pg_module_magic!();
 
 #[pg_schema]
-pub mod bert {
-    use super::{nlp,serialize_vector};
+pub mod nlp {
+    use super::{models,serialize_vector};
     use pgx::{prelude::*, warning};
     #[pg_extern]
     pub fn translate(from:&str, to:&str, text:&str)->String {
-        let result = nlp::get_translation_model(from, to);
+        let result = models::get_translation_model(from, to);
         if result.is_err() { warning!("can't find model: {:?}", result.as_ref().err()); }
         let translator = result.unwrap();
         translator.translate(text)
@@ -18,7 +18,7 @@ pub mod bert {
 
     #[pg_extern]
     pub fn sentence_embeddings(sentence:&str)->String {
-        let model = nlp::get_sentence_embeddings_model();
+        let model = models::get_sentence_embeddings_model();
         if model.is_err() { warning!("can't find model: {:?}", model.as_ref().err()); }
         serialize_vector(model.unwrap().encode(sentence))
     }
@@ -41,7 +41,7 @@ mod tests {
     use pgx::{prelude::*};
 
     #[pg_test]
-    fn bert_translate() { assert_eq!("hello", crate::bert::translate("nl","en","hallo")); }
+    fn bert_translate() { assert_eq!("hello", crate::nlp::translate("nl", "en", "hallo")); }
 
     #[test]
     fn serialize_vector_test() {
@@ -55,12 +55,6 @@ mod tests {
 /// It must be visible at the root of your extension crate.
 #[cfg(test)]
 pub mod pg_test {
-    pub fn setup(_options: Vec<&str>) {
-        // perform one-off initialization when the pg_test framework starts
-    }
-
-    pub fn postgresql_conf_options() -> Vec<&'static str> {
-        // return any postgresql.conf settings that are required for your tests
-        vec![]
-    }
+    pub fn setup(_options: Vec<&str>) {}
+    pub fn postgresql_conf_options() -> Vec<&'static str> { vec![] }
 }
