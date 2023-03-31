@@ -1,12 +1,8 @@
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use once_cell::sync::{OnceCell,Lazy};
-use pgx::{warning};
-use pgx::prelude::*;
+use once_cell::sync::{Lazy};
 use rust_bert::pipelines::translation::{Language, TranslationModel, TranslationModelBuilder};
 use rust_bert::pipelines::sentence_embeddings::{SentenceEmbeddingsBuilder,SentenceEmbeddingsModel,SentenceEmbeddingsModelType};
-use std::sync::mpsc;
-use std::thread;
 
 // type Translator = fn(text:&str)->Result<String, String>;
 // https://discuss.pytorch.org/t/is-inference-thread-safe/88583
@@ -62,7 +58,6 @@ pub fn get_translation_model(from:&str, to:&str)->Result<Translator,String> {
     let target = string_to_language(to);
     if target.is_none() { return Err("target language unknown".to_string()) }
     let repo = TRANSLATION_MODELS.lock().unwrap();
-
     match repo.get(&(source.unwrap(),target.unwrap())) {
         Some(&ref model) => Ok(Translator{source:source.unwrap(), target:target.unwrap(), model: model.clone() }),
         None => Err("other error".to_string())
@@ -91,7 +86,6 @@ pub fn get_sentence_embeddings_model()->Result<Arc<MySentenceEmbeddingsModel>,St
         None => Err("no sentence embedding model error".to_string())
     }
 }
-
 
 #[cfg(test)]
 mod tests {
