@@ -6,11 +6,11 @@
 
 1. Install [libtorch](https://pytorch.org/get-started/locally/) \
    https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.13.1%2Bcpu.zip
-1. `cargo install --locked cargo-pgx`
-2. `cargo pgx init`
+2. `cargo install --locked cargo-pgx`
+3. `cargo pgx init`
 
 This extension can be used together with the pgvector extension.
-Pgvector must be compiled from source and to copied to the pgx test intallsion of postgresql.
+Pgvector must be compiled from source and to copied to the pgx test installation of postgresql.
 
     cp vector.so ~/.pgx/15.2/pgx-install/lib/postgresql/
     cp vector.control ~/.pgx/15.2/pgx-install/share/postgresql/extension/
@@ -25,6 +25,10 @@ Run example:
 
     LD_LIBRARY_PATH=/home/werner/Code/libtorch/lib:$LD_LIBRARY_PATH cargo pgx run
 
+Install package
+
+    LD_LIBRARY_PATH=/home/werner/Code/libtorch/lib:$LD_LIBRARY_PATH sudo cargo pgx install
+
 ## Config
 * `RUSTBERT_CACHE` location of language models defaults to `~/.cache/.rustbert`
 * `PGX_IGNORE_RUST_VERSIONS`
@@ -32,4 +36,6 @@ Run example:
 ## Awesome links
 
 * [Postgresql Internals](https://postgrespro.com/community/books/internals)
-
+* [The Wonders of Postgres Logical Decoding Messages](https://www.infoq.com/articles/wonders-of-postgres-logical-decoding-messages/)
+* 
+   
