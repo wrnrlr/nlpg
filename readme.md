@@ -37,5 +37,3 @@ Install package
 
 * [Postgresql Internals](https://postgrespro.com/community/books/internals)
 * [The Wonders of Postgres Logical Decoding Messages](https://www.infoq.com/articles/wonders-of-postgres-logical-decoding-messages/)
-* 
-   

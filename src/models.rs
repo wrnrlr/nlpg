@@ -48,7 +48,7 @@ pub struct Translator {
 impl Translator {
     pub fn translate(&self, text:&str)->String {
         let output = self.model.0.translate(&[text], self.source, self.target);
-        output.unwrap()[0].to_string()
+        output.unwrap()[0].trim().to_string()
     }
 }
 
