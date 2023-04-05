@@ -37,3 +37,4 @@ Install package
 
 * [Postgresql Internals](https://postgrespro.com/community/books/internals)
 * [The Wonders of Postgres Logical Decoding Messages](https://www.infoq.com/articles/wonders-of-postgres-logical-decoding-messages/)
+* [Neural Networks: Zero to Hero](https://karpathy.ai/zero-to-hero.html), ML course by Andrej Karpathy
