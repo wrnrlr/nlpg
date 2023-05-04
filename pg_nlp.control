@@ -1,5 +1,5 @@
-comment = 'pg_nlp:  Created by pgx'
+comment = 'nlpg:  Created by pgx'
 default_version = '@CARGO_VERSION@'
-module_pathname = '$libdir/pg_nlp'
+module_pathname = '$libdir/nlpg'
 relocatable = false
 superuser = true
