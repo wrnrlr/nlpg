@@ -9,7 +9,7 @@ translation, classification, sentance embeddings and much more.
 
 ### Translate text
 ```sql
-select babel('Hallo','nl');
+select babel('Hallo','nl','en');
 Hello
 ```
 
@@ -26,11 +26,10 @@ select vector(sbert('...'));
 ```
 It supports the operators for the L2 product `<->`, the cosine distance `<=>` or the inner product `<#>`.
 
-
 ### Summary Text
 ```sql
-select summary('Hallo');
-Hello
+select summary('...');
+...
 ```
 
 ### Ask a Question
@@ -44,8 +43,8 @@ Hello
 Classify text with a pretrained language transformer.
 
 ```sql
-select zero_shot('text',['a','b','c']);
-'a'
+select zero_shot('text',['amsterdam','berlin','copenhagen']);
+'berlin'
 ```
 
 ## Installation
