@@ -19,7 +19,7 @@ select sbert('...');
 '[...]'
 ```
 
-The output of bert is supported by [pgvector](https://github.com/pgvector/pgvector).
+The output of `sbert` is supported by [pgvector](https://github.com/pgvector/pgvector).
 ```sql
 select vector(sbert('...'));
 [...]
