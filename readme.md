@@ -1,4 +1,41 @@
-# Natural Language Processing for Postgresql
+# PG NLP
+
+This is an extension of SQL that supports common natural language processing tasks.
+
+## Api
+
+### Translate text
+```sql
+select babel('Hallo','nl');
+Hello
+```
+
+### Sentence Embeddings
+```sql
+select sbert('Hallo');
+'{...}'
+```
+
+### Summary Text
+```sql
+select summary('Hallo');
+Hello
+```
+
+### Ask a Question
+```sql
+select ask_question('Hallo','context');
+Hello
+```
+
+### Zero shot Classification
+
+Classify text with a pretrained language transformer.
+
+```sql
+select zero_shot('text',['a','b','c']);
+'a'
+```
 
 ### Prerequazites
 
@@ -12,7 +49,7 @@
 This extension can be used together with the pgvector extension.
 Pgvector must be compiled from source and to copied to the pgx test installation of postgresql.
 
-    cp vector.so ~/.pgx/15.2/pgx-install/lib/postgresql/
+    cp vector.so ~/.pgx/15.2/pgx-install/lib/postgresql/x
     cp vector.control ~/.pgx/15.2/pgx-install/share/postgresql/extension/
     cp sql/vector*.sql ~/.pgx/15.2/pgx-install/share/postgresql/extension/
 
