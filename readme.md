@@ -49,6 +49,17 @@ select zero_shot('text',['amsterdam','berlin','copenhagen']);
 
 ## Installation
 
+Make sure to install both [`pgx`](https://crates.io/crates/pgx) and [`rust-bert`](https://crates.io/crates/rust-bert) correctly
+and config your environment variables to be able to find the `libtorch` shared library.
+
+Run example:
+
+    LD_LIBRARY_PATH=/home/werner/Code/libtorch/lib:$LD_LIBRARY_PATH cargo pgx run
+
+Install package
+
+    LD_LIBRARY_PATH=/home/werner/Code/libtorch/lib:$LD_LIBRARY_PATH sudo cargo pgx install
+
 * Nix: TODO
 * Source: TODO
 * Ubuntu: `sudo apt install build-essential libclang-dev libreadline-dev zlib1g-dev flex bison libxml2-dev libxslt-dev libssl-dev libxml2-utils xsltproc ccache postgresql-server-dev-15 -y`
@@ -64,19 +75,6 @@ Pgvector must be compiled from source and to copied to the pgx test installation
     cp vector.so ~/.pgx/15.2/pgx-install/lib/postgresql/x
     cp vector.control ~/.pgx/15.2/pgx-install/share/postgresql/extension/
     cp sql/vector*.sql ~/.pgx/15.2/pgx-install/share/postgresql/extension/
-
-## Installation
-
-Make sure to install both [`pgx`](https://crates.io/crates/pgx) and [`rust-bert`](https://crates.io/crates/rust-bert) correctly
-and config your environment variables to be able to find the `libtorch` shared library.
-
-Run example:
-
-    LD_LIBRARY_PATH=/home/werner/Code/libtorch/lib:$LD_LIBRARY_PATH cargo pgx run
-
-Install package
-
-    LD_LIBRARY_PATH=/home/werner/Code/libtorch/lib:$LD_LIBRARY_PATH sudo cargo pgx install
 
 ## Config
 * `RUSTBERT_CACHE` location of language models defaults to `~/.cache/.rustbert`
