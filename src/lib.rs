@@ -16,7 +16,7 @@ static QA_MODEL: Handle<QuestionAnsweringModel> = Lazy::new(||{Mutex::new(Questi
 
 /// Translate text from one language to the other
 #[pg_extern] pub fn babel(from:&str, to:&str, text:&str) -> String {
-    let result = models::get_translation_model(from, to);
+    let result = get_translation_model(from, to);
     if result.is_err() { warning!("can't find babel model: {:?}", result.as_ref().err()); }
     let translator = result.unwrap();
     translator.translate(text)
@@ -24,7 +24,7 @@ static QA_MODEL: Handle<QuestionAnsweringModel> = Lazy::new(||{Mutex::new(Questi
 
 /// Sentence embeddings
 #[pg_extern] pub fn sbert(sentence:&str) -> String {
-    let model = models::get_sentence_embeddings_model();
+    let model = get_sentence_embeddings_model();
     if model.is_err() { warning!("can't find sbert model: {:?}", model.as_ref().err()); }
     serialize_vector(model.unwrap().encode(sentence))
 }
@@ -48,7 +48,7 @@ static QA_MODEL: Handle<QuestionAnsweringModel> = Lazy::new(||{Mutex::new(Questi
 }
 #[derive(PostgresType)] struct NamedEntity { word:String, score:f32, label:String, offset:u32 }
 
-pub struct WrappedTranslationModel(pub TranslationModel);
+struct WrappedTranslationModel(pub TranslationModel);
 unsafe impl Send for WrappedTranslationModel {}
 unsafe impl Sync for WrappedTranslationModel {}
 
@@ -74,7 +74,7 @@ impl Translator {
     }
 }
 
-pub fn get_translation_model(from:&str, to:&str)->Result<Translator,String> {
+fn get_translation_model(from:&str, to:&str)->Result<Translator,String> {
     let source = string_to_language(from);
     if source.is_none() { return Err("source language unknown".to_string()) }
     let target = string_to_language(to);
@@ -86,11 +86,11 @@ pub fn get_translation_model(from:&str, to:&str)->Result<Translator,String> {
     }
 }
 
-pub struct MySentenceEmbeddingsModel(pub SentenceEmbeddingsModel);
+struct MySentenceEmbeddingsModel(pub SentenceEmbeddingsModel);
 unsafe impl Send for MySentenceEmbeddingsModel {}
 unsafe impl Sync for MySentenceEmbeddingsModel {}
 impl MySentenceEmbeddingsModel {
-    pub fn encode(&self, text:&str)->Vec<f32> {
+    fn encode(&self, text:&str)->Vec<f32> {
         self.0.encode(&[text]).unwrap()[0].clone()
     }
 }
@@ -101,13 +101,15 @@ static SENTENCE_EMBEDDINGS_MODELS: Lazy<Mutex<HashMap<String,Arc<MySentenceEmbed
     Mutex::new(m)
 });
 
-pub fn get_sentence_embeddings_model()->Result<Arc<MySentenceEmbeddingsModel>,String> {
+fn get_sentence_embeddings_model()->Result<Arc<MySentenceEmbeddingsModel>,String> {
     let repo = SENTENCE_EMBEDDINGS_MODELS.lock().unwrap();
     match repo.get(&"AllMiniLmL12V2".to_string()) {
         Some(&ref model) => Ok(model.clone()),
         None => Err("no sentence embedding model found".to_string())
     }
 }
+
+// enum LanguageCode { EN,ES,PT,IT,CA,DE,RU,ZH,NL,SV,AR,HE,HI }
 
 fn string_to_language(s:&str)->Option<Language> {
     match s {
@@ -128,15 +130,10 @@ fn string_to_language(s:&str)->Option<Language> {
     }
 }
 
-fn serialize_vector(v:Vec<f32>)->String {
-    let mut buffer = ryu::Buffer::new();
-    let mut s = String::from('[');
-    for (i,f) in v.iter().enumerate() {
-        if i != 0 { s.push(','); }
-        s.push_str(buffer.format(*f));
-    }
-    s.push(']');
-    s
+pub(crate) fn serialize_vector(v:Vec<f32>)->String {
+    let mut buffer = ryu::Buffer::new(); let mut s = String::from('[');
+    for (i,f) in v.iter().enumerate() { if i != 0 { s.push(','); } s.push_str(buffer.format(*f)); }
+    s.push(']'); s
 }
 
 #[cfg(any(test, feature = "pg_test"))] #[pg_schema] mod tests {

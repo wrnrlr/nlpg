@@ -54,11 +54,11 @@ and config your environment variables to be able to find the `libtorch` shared l
 
 Run example:
 
-    LD_LIBRARY_PATH=/home/werner/Code/libtorch/lib:$LD_LIBRARY_PATH cargo pgx run
+    LD_LIBRARY_PATH=${HOME}/Code/libtorch/lib:$LD_LIBRARY_PATH cargo pgx run
 
 Install package
 
-    LD_LIBRARY_PATH=/home/werner/Code/libtorch/lib:$LD_LIBRARY_PATH sudo cargo pgx install
+    LD_LIBRARY_PATH=${HOME}/Code/libtorch/lib:$LD_LIBRARY_PATH sudo cargo pgx install
 
 * Nix: TODO
 * Source: TODO
